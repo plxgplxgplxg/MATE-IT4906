@@ -7,6 +7,7 @@
 import math
 import os
 import sys
+import warnings
 
 import numpy as np
 from gymnasium import error
@@ -96,7 +97,15 @@ class Viewer:
     def close(self):
         if self.isopen and sys.meta_path:
             # ^^^ check sys.meta_path to avoid 'ImportError: sys.meta_path is None, Python is likely shutting down'
-            self.window.close()
+            try:
+                self.window.close()
+            except AttributeError as exc:
+                # pyglet 1.5.x can fail during Cocoa event-loop teardown on macOS/Python 3.13.
+                warnings.warn(
+                    f"Ignoring pyglet window close failure during teardown: {exc}",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
             self.isopen = False
 
     def window_closed_by_user(self):
