@@ -5,7 +5,7 @@ import os
 # import gymnasium as gym
 import gymnasium as gym
 
-from mate import agents, cmcpga, constants, environment, utils, wrappers
+from mate import agents, constants, environment, utils, wrappers
 from mate.agents import (
     GreedyCameraAgent,
     GreedyTargetAgent,
@@ -14,7 +14,6 @@ from mate.agents import (
     RandomCameraAgent,
     RandomTargetAgent,
 )
-from mate.cmcpga import CMCPGACameraAgent, CMCPGACameraPolicyAgent
 from mate.environment import ASSETS_DIR, MultiAgentTracking
 from mate.wrappers import (
     MultiCamera,
@@ -30,7 +29,6 @@ from mate.wrappers import (
 )
 
 __all__ = [
-    "make",
     "make_environment",
     "MultiCamera",
     "MultiTarget",
@@ -42,8 +40,6 @@ __all__ = [
     "RandomTargetAgent",
     "HeuristicCameraAgent",
     "HeuristicTargetAgent",
-    "CMCPGACameraAgent",
-    "CMCPGACameraPolicyAgent",
 
     "group_reset",
     "group_step",
@@ -55,7 +51,6 @@ __all__.extend(constants.__all__)
 __all__.extend(environment.__all__)
 __all__.extend(wrappers.__all__)
 __all__.extend(agents.__all__)
-__all__.extend(cmcpga.__all__)
 __all__.extend(utils.__all__)
 
 
@@ -77,12 +72,6 @@ def make_environment(config=None, wrappers=(), **kwargs):  # pylint: disable=red
         env = wrapper(env)
 
     return env
-
-
-def make(id="MultiAgentTracking-v0", *args, **kwargs):
-    if args:
-        raise TypeError("mate.make only accepts the environment id as positional input.")
-    return make_environment(**kwargs)
 
 
 gym.register(

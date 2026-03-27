@@ -43,15 +43,6 @@ except ImportError as e:
 RAD2DEG = 57.29577951308232
 
 
-def _safe_close_window(window):
-    """Work around pyglet 1.5.x Cocoa shutdown issues on newer Python/macOS."""
-    try:
-        window.close()
-    except AttributeError as exc:
-        if 'CocoaAlternateEventLoop' not in str(exc) or 'platform_event_loop' not in str(exc):
-            raise
-
-
 def get_display(spec):
     """Convert a display specification (such as :0) into an actual Display
     object.
@@ -105,7 +96,7 @@ class Viewer:
     def close(self):
         if self.isopen and sys.meta_path:
             # ^^^ check sys.meta_path to avoid 'ImportError: sys.meta_path is None, Python is likely shutting down'
-            _safe_close_window(self.window)
+            self.window.close()
             self.isopen = False
 
     def window_closed_by_user(self):
@@ -455,7 +446,7 @@ class SimpleImageViewer:
     def close(self):
         if self.isopen and sys.meta_path:
             # Check sys.meta_path to avoid 'ImportError: sys.meta_path is None, Python is likely shutting down'
-            _safe_close_window(self.window)
+            self.window.close()
             self.isopen = False
 
     def __del__(self):
