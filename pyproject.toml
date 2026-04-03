@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "mate"
 version = "0.1.0"
@@ -22,3 +26,10 @@ dependencies = [
     "torchinfo>=1.8.0",
     "tqdm>=4.67.1",
 ]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mate*", "gym_agent*", "common_net*"]

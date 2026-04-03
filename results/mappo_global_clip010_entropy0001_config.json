@@ -1,0 +1,17 @@
+{
+  "run_name": "mappo_global_clip010_entropy0001",
+  "total_env_steps": 200000,
+  "train_chunk_steps": 20000,
+  "eval_every_steps": 20000,
+  "eval_episodes": 5,
+  "eval_max_steps": 500,
+  "critic_input_mode": "global",
+  "clip_range": 0.1,
+  "entropy_coef": 0.001,
+  "num_envs": 8,
+  "rollout_length": 400,
+  "n_epochs": 5,
+  "num_mini_batches": 1,
+  "recurrent_chunk_length": 20,
+  "seed": 42
+}

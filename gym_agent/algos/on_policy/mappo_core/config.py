@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Literal
 from typing import Optional
 
 
@@ -19,13 +20,14 @@ class MAPPOConfig:
     weight_decay: float = 0.0
     n_epochs: int = 5
     num_mini_batches: int = 1
-    recurrent_chunk_length: int = 10
+    recurrent_chunk_length: int = 20
     hidden_dim: int = 64
     fc_dim: int = 64
     max_grad_norm: float = 10.0
     huber_delta: float = 10.0
     use_value_normalization: bool = True
     normalize_advantage: bool = True
+    critic_input_mode: Literal["local", "global", "agent_specific"] = "agent_specific"
     log_std_min: float = -5.0
     log_std_max: float = 2.0
     last_layer_gain: float = 0.01

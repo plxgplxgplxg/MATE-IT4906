@@ -5,13 +5,15 @@ import warnings
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from io import TextIOBase
-from typing import Any, Optional, TextIO, Union
+from typing import TYPE_CHECKING, Any, Optional, TextIO, Union
 from pathlib import Path
 
-import matplotlib.figure
 import numpy as np
 import pandas
 import torch as th
+
+if TYPE_CHECKING:
+    import matplotlib.figure
 
 try:
     from torch.utils.tensorboard import SummaryWriter
@@ -53,7 +55,7 @@ class Figure:
     :param close: if true, close the figure after logging it
     """
 
-    def __init__(self, figure: matplotlib.figure.Figure, close: bool):
+    def __init__(self, figure: "matplotlib.figure.Figure", close: bool):
         self.figure = figure
         self.close = close
 

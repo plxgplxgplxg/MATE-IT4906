@@ -1,0 +1,11 @@
+episode,checkpoint,episode_reward,coverage_rate,transport_rate,delivered_cargoes
+1,checkpoints/mappo_global_clip010_entropy0001_best_eval.pt,-3669.0,0.5,0.63625,32.0
+2,checkpoints/mappo_global_clip010_entropy0001_best_eval.pt,-3635.0,0.625,0.614375,32.0
+3,checkpoints/mappo_global_clip010_entropy0001_best_eval.pt,-4058.0,0.25,0.665,32.0
+4,checkpoints/mappo_global_clip010_entropy0001_best_eval.pt,-3836.0,0.625,0.635,32.0
+5,checkpoints/mappo_global_clip010_entropy0001_best_eval.pt,-4002.0,0.125,0.640625,32.0
+6,checkpoints/mappo_global_clip010_entropy0001_best_eval.pt,-3265.0,0.375,0.6043333333333333,30.0
+7,checkpoints/mappo_global_clip010_entropy0001_best_eval.pt,-2661.0,0.5,0.5442857142857143,28.0
+8,checkpoints/mappo_global_clip010_entropy0001_best_eval.pt,-4063.0,0.25,0.7067741935483871,31.0
+9,checkpoints/mappo_global_clip010_entropy0001_best_eval.pt,-3613.0,0.5,0.609375,32.0
+10,checkpoints/mappo_global_clip010_entropy0001_best_eval.pt,-3173.0,0.625,0.6062068965517241,29.0

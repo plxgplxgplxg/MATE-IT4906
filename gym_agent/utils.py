@@ -5,8 +5,6 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Any
 
-import matplotlib.pyplot as plt
-
 import gymnasium.spaces as spaces
 
 
@@ -201,6 +199,8 @@ def plot_rl_style(scores, window, filename=None):
     """
     RL-paper style plot: smoothed mean with a shaded band (mean ± std).
     """
+    import matplotlib.pyplot as plt
+
     if filename is not None and not isinstance(filename, str):
         raise ValueError("Filename must be a string or None.")
 
