@@ -49,6 +49,8 @@ class RecurrentGaussianActor(nn.Module):
         self,
         obs_dim: int,
         action_dim: int,
+        action_low: torch.Tensor,
+        action_high: torch.Tensor,
         hidden_dim: int,
         fc_dim: int,
         log_std_min: float,
@@ -58,6 +60,13 @@ class RecurrentGaussianActor(nn.Module):
         super().__init__()
         self.log_std_min = log_std_min
         self.log_std_max = log_std_max
+        action_low = action_low.to(dtype=torch.float32)
+        action_high = action_high.to(dtype=torch.float32)
+        self.register_buffer("action_low", action_low)
+        self.register_buffer("action_high", action_high)
+        self.register_buffer("action_scale", (action_high - action_low) / 2.0)
+        self.register_buffer("action_bias", (action_high + action_low) / 2.0)
+        self._squash_epsilon = 1e-6
         self.backbone = RecurrentBackbone(obs_dim, hidden_dim, fc_dim)
         self.mean_head = nn.Linear(hidden_dim, action_dim)
         self.log_std_head = nn.Linear(hidden_dim, action_dim)
@@ -76,6 +85,29 @@ class RecurrentGaussianActor(nn.Module):
         log_std = self.log_std_head(features).clamp(self.log_std_min, self.log_std_max)
         return means, log_std, next_hidden
 
+    def _scale_action(self, squashed_action: torch.Tensor) -> torch.Tensor:
+        return squashed_action * self.action_scale + self.action_bias
+
+    def _unsquash_action(self, scaled_action: torch.Tensor) -> torch.Tensor:
+        normalized = (scaled_action - self.action_bias) / self.action_scale
+        normalized = normalized.clamp(
+            min=-1.0 + self._squash_epsilon,
+            max=1.0 - self._squash_epsilon,
+        )
+        return torch.atanh(normalized)
+
+    def _log_prob_from_pre_tanh(
+        self,
+        distribution: Normal,
+        pre_tanh_action: torch.Tensor,
+        squashed_action: torch.Tensor,
+    ) -> torch.Tensor:
+        log_prob = distribution.log_prob(pre_tanh_action)
+        squash_correction = torch.log(self.action_scale) + torch.log(
+            1.0 - squashed_action.square() + self._squash_epsilon
+        )
+        return (log_prob - squash_correction).sum(dim=-1)
+
     def act(
         self,
         observations: torch.Tensor,
@@ -93,8 +125,14 @@ class RecurrentGaussianActor(nn.Module):
         means = means[:, 0]
         log_std = log_std[:, 0]
         distribution = Normal(means, log_std.exp())
-        actions = means if deterministic else distribution.sample()
-        log_prob = distribution.log_prob(actions).sum(dim=-1)
+        pre_tanh_action = means if deterministic else distribution.rsample()
+        squashed_action = torch.tanh(pre_tanh_action)
+        actions = self._scale_action(squashed_action)
+        log_prob = self._log_prob_from_pre_tanh(
+            distribution,
+            pre_tanh_action,
+            squashed_action,
+        )
         return actions, log_prob, next_hidden
 
     def evaluate_actions(
@@ -106,7 +144,18 @@ class RecurrentGaussianActor(nn.Module):
     ) -> tuple[torch.Tensor, torch.Tensor]:
         means, log_std, _ = self.forward(observations, hidden_state, episode_starts)
         distribution = Normal(means, log_std.exp())
-        log_prob = distribution.log_prob(actions).sum(dim=-1)
+        pre_tanh_action = self._unsquash_action(actions)
+        squashed_action = (actions - self.action_bias) / self.action_scale
+        squashed_action = squashed_action.clamp(
+            min=-1.0 + self._squash_epsilon,
+            max=1.0 - self._squash_epsilon,
+        )
+        log_prob = self._log_prob_from_pre_tanh(
+            distribution,
+            pre_tanh_action,
+            squashed_action,
+        )
+        # Dung entropy Gaussian goc nhu xap xi on dinh cho entropy bonus.
         entropy = distribution.entropy().sum(dim=-1)
         return log_prob, entropy
 

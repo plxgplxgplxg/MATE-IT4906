@@ -28,6 +28,12 @@ class MultiCameraEnvBatch:
                 f"MAPPO expects continuous camera actions, got {camera_action_space}."
             )
         self.action_dim = int(np.prod(camera_action_space.shape))
+        self.action_low = np.asarray(camera_action_space.low, dtype=np.float32).reshape(
+            self.action_dim
+        )
+        self.action_high = np.asarray(camera_action_space.high, dtype=np.float32).reshape(
+            self.action_dim
+        )
 
     def reset(self) -> np.ndarray:
         observations = []

@@ -68,6 +68,8 @@ class MAPPO:
         self.actor = RecurrentGaussianActor(
             obs_dim=self.obs_dim,
             action_dim=self.action_dim,
+            action_low=self._torch(self.env_batch.action_low, dtype=torch.float32),
+            action_high=self._torch(self.env_batch.action_high, dtype=torch.float32),
             hidden_dim=self.config.hidden_dim,
             fc_dim=self.config.fc_dim,
             log_std_min=self.config.log_std_min,
@@ -528,7 +530,21 @@ class MAPPO:
             opponent_agent_factory=opponent_agent_factory,
         )
         # Nap trong so
-        agent.actor.load_state_dict(checkpoint["actor"])
+        incompatible_keys = agent.actor.load_state_dict(checkpoint["actor"], strict=False)
+        unexpected_actor_keys = set(incompatible_keys.unexpected_keys)
+        missing_actor_keys = set(incompatible_keys.missing_keys)
+        allowed_missing_actor_keys = {
+            "action_low",
+            "action_high",
+            "action_scale",
+            "action_bias",
+        }
+        if unexpected_actor_keys or (missing_actor_keys - allowed_missing_actor_keys):
+            raise RuntimeError(
+                "Actor checkpoint is incompatible with the current implementation. "
+                f"Missing keys: {sorted(missing_actor_keys)}. "
+                f"Unexpected keys: {sorted(unexpected_actor_keys)}."
+            )
         agent.critic.load_state_dict(checkpoint["critic"])
         agent.actor_optimizer.load_state_dict(checkpoint["actor_optimizer"])
         agent.critic_optimizer.load_state_dict(checkpoint["critic_optimizer"])
