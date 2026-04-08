@@ -18,9 +18,19 @@ _test*
 
 # Editor / OS files
 .DS_Store
+._*
+__MACOSX/
+Thumbs.db
+ehthumbs.db
+.AppleDouble
+.LSOverride
+.Spotlight-V100/
+.TemporaryItems/
+.Trashes/
 .vscode/
 .idea/
 
 # Project-local generated content
-docs/
 checkpoints/
+results/
+docs/
