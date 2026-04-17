@@ -8,6 +8,7 @@ from .algos.off_policy.dqn import DQN, DQNConfig
 from .algos.on_policy.a2c import A2C, A2CConfig
 from .algos.on_policy.mappo import MAPPO, MAPPOConfig
 from .algos.on_policy.ppo import PPO, PPOConfig
+from q_marl import QMARL, QMARLConfig
 
 __all__ = [
     "make",
@@ -18,5 +19,6 @@ __all__ = [
 
     "A2C", "A2CConfig",
     "MAPPO", "MAPPOConfig",
-    "PPO", "PPOConfig"
+    "PPO", "PPOConfig",
+    "QMARL", "QMARLConfig",
 ]
